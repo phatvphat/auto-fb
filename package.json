@@ -1,0 +1,24 @@
+{
+  "name": "auto-fb",
+  "version": "1.0.0",
+  "description": "Công cụ Marketing Facebook dạo",
+  "main": "index.js",
+  "dependencies": {
+    "facebook-chat-api": "^1.6.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phatvphat/auto-fb.git"
+  },
+  "author": "PvP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phatvphat/auto-fb/issues"
+  },
+  "homepage": "https://github.com/phatvphat/auto-fb#readme"
+}
