@@ -2,12 +2,12 @@
 Công cụ Marketing Facebook dạo.
 
 
-B1. Cần tạo phiên đăng nhập bằng cách lưu cookie qua file login.js
+- Cài đặt tại file index.js và chạy nó.
 
-B2. Các chức năng:
+- Các chức năng:
 
-    + Để dùng Auto-Like cần cấu hình và chạy file likes.1.js
+    + Auto-Like
 
-    + Để dùng Auto-Cmt-Pr bài viết cần cấu hình và chạy file cmt-pr.1.js
+    + Auto-Cmt-Pr quảng bá nội dung vào nhận xét
 
-    + Để dùng Auto-Cmt-Uptop bump bài viết cần cấu hình và chạy file cmt-uptop.1.js
+    + Auto-Cmt-Uptop bump bài viết (chưa hoàn thành)

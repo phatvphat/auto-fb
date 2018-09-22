@@ -1,13 +1,16 @@
 "use strict";
 const func = require('./func')
 
+var func_ = module.exports = {}
 
-var src = 'log.cmt-pr.txt'
 
-setInterval(async function () {
-    var access_token = '' // Nhập Token đây, Token này mục đích get id bài viết nên sẽ không bị block
-    var pages = [320523315068360] // List ID Pages
-    var cmt = 'Đã xem ✔\nĐã like ✔ ✅✅\nĐã cmt ↓↓↓↓✔ \nTt ib me☆\nQuý chủ tus ☆☆\nĐừg bơ nha <3 <3' // Cmt đây
+var src = './log/log.cmt-pr.txt'
+
+func_.cmt_pr = async function (CMT, arr_ids) {
+    var access_token = await func.access_token
+    var arr_ids_ = arr_ids[Math.floor(Math.random() * arr_ids.length)]
+    var pages = [arr_ids_] // List IDs
+    var cmt = CMT
     var b = await func.readFile_(src)
     // console.log(b)
     for (var ii in pages) {
@@ -24,4 +27,4 @@ setInterval(async function () {
             }
         }
     }
-}, 1000 * 45) // Thời gian cmt dạo 1 bài viết
+}

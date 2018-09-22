@@ -1,17 +1,46 @@
 const request = require('request')
 const fs = require('fs')
+const login = require("facebook-chat-api")
+const moment = require('moment')
+
 
 var func = module.exports = {}
 var globals_ = {}
 
+func.TimeDate = function (type = '') {
+    // var d = new Date()
+    // var timeStamp = d.getTime()
+    // return timeStamp
+    switch (type) {
+        case 'ddd':
+            return Number(moment.unix(moment().unix()).format("ddd"));
+            break;
+        case 'HH':
+            return Number(moment.unix(moment().unix()).format("HH"));
+            break;
+        case 'mm':
+            return Number(moment.unix(moment().unix()).format("mm"));
+            break;
+        default: return moment().unix();
+    }
+}
+func.randNum = function (from = 1, to = 2) {
+    return Math.floor((Math.random() * Number(to)) + Number(from))
+}
+
 func.readFile_ = async (src) => {
     return await new Promise(function (resolve, reject) {
-        fs.readFile(src, 'utf-8', function (err, buf) {
-            if (err) reject(err)
-            let a = buf.toString()
-            // console.log(a)
-            resolve(a)
-        })
+        if (fs.existsSync(src)) {
+            fs.readFile(src, 'utf-8', function (err, buf) {
+                if (err) reject(err)
+                let a = buf.toString()
+                // console.log(a)
+                resolve(a)
+            })
+        } else {
+            fs.writeFileSync(src, '')
+            resolve('')
+        }
     })
 }
 func.writeFile_ = (src, text) => {
@@ -21,7 +50,19 @@ func.writeFile_ = (src, text) => {
     })
 }
 
+async function request__(p, method = 'GET', headers = {}, form = {}, followRedirect = false) {
+    return new Promise((resolve, reject) => {
+        // console.log(form)
+        request({ method: method, url: p, headers: headers, form: form, followRedirect: followRedirect }, async function (error, response, body) {
+            if (error) reject(error)
+            // console.log(body)
+            if (method != 'GET') { body = response.headers.location }
+            resolve(body)
+        })
+    })
+}
 func.request_ = async (p, method = 'GET', headers = {}, form = {}) => {
+    var aa = await request__(p, method = 'GET', headers = {}, form = {})
     return new Promise((resolve, reject) => {
         // console.log(form)
         request({ method: method, url: p, headers: headers, form: form }, async function (error, response, body) {
@@ -31,21 +72,31 @@ func.request_ = async (p, method = 'GET', headers = {}, form = {}) => {
             resolve(body)
         })
     })
+    return aa
 }
+
+func.login = async function (username, password) {
+    if (fs.existsSync('appstate.json')) {
+        login({ appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) }, async (err, api) => {
+            if (err) {
+                login({ email: username, password: password }, (err, api) => {
+                    if (err) return console.error(err)
+                    fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState())) // Đăng nhập lưu cookie
+                })
+            }
+        })
+    } else {
+        login({ email: username, password: password }, (err, api) => {
+            if (err) return console.error(err)
+            fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState())) // Đăng nhập lưu cookie
+        })
+    }
+}
+
+func.isOdd = function (num) { return num % 2; }
+
 
 // Hàm tương tác
-
-async function request__(p, method = 'GET', headers = {}, form = {}) {
-    return new Promise((resolve, reject) => {
-        // console.log(form)
-        request({ method: method, url: p, headers: headers, form: form }, async function (error, response, body) {
-            if (error) reject(error)
-            // console.log(response.headers.location)
-            if (method != 'GET') { body = response.headers.location }
-            resolve(body)
-        })
-    })
-}
 
 async function cookie_() {
     var src = 'appstate.json'
@@ -77,6 +128,34 @@ async function fb_dtsg() {
     // console.log(data)
     return data
 }
+func.access_token = async function () {
+    var a = await cookie_()
+    // console.log(a)
+    var b = a.match(/;c_user=(.*);xs/i)
+    b = b[0].replace(';c_user=', '')
+    b = b.replace(';xs', '')
+    var headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': a
+    }
+    if (globals_['access_token'] == undefined) {
+        var data = await request__('https://www.facebook.com/' + b, 'GET', headers, {}, true)
+        data = data.match(/<a accesskey="7" class="accessible_elem" href="https:\/\/www.facebook.com\/(.*)\/allactivity\?privacy_source/)
+        data = data[0].replace('<a accesskey="7" class="accessible_elem" href="https://www.facebook.com/', '')
+        data = data.replace('/allactivity?privacy_source', '')
+
+        var data = await request__('https://www.facebook.com/' + data, 'GET', headers, {})
+        data = data.match(/multi_partitioning_enabled:false,access_token:"(.*)",resumability_enabled/)
+        data = data[0].split('",resumability_enabled')[0]
+        data = data.replace('multi_partitioning_enabled:false,access_token:"', '')
+        globals_['access_token'] = data
+    } else { data = globals_['access_token'] }
+    console.log(data)
+    return data
+}
+// access_token()
+// Đăng Nhận xét
 func.cmt = async (id_post, comment_text) => {
     var a = await cookie_()
     var b = await fb_dtsg()
@@ -100,6 +179,7 @@ func.cmt = async (id_post, comment_text) => {
     console.log('Đã nhận xét. ID:', data)
     return data
 }
+// Xoá Nhận Xét
 func.del_cmt = async (id_post, id_cmt) => {
     var a = await cookie_()
     var b = await fb_dtsg()
@@ -116,8 +196,9 @@ func.del_cmt = async (id_post, id_cmt) => {
         fb_dtsg: b
     }
     var data = await request__('https://m.facebook.com/ufi/delete/?delete_comment_id=' + id_cmt + '&delete_comment_fbid=' + id_cmt + '&ft_ent_identifier=' + id_post, 'POST', headers, form)
-    console.log('Đã xoá nhận xét.')
+    console.log('Đã xoá nhận xét. ID:', id_cmt)
 }
+// React bài viết
 func.react_post = async (id_post, reaction_type = 'like') => {
     var a = await cookie_()
     var b = await fb_dtsg()
