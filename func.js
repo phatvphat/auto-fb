@@ -13,7 +13,7 @@ func.TimeDate = function (type = '') {
     // return timeStamp
     switch (type) {
         case 'ddd':
-            return Number(moment.unix(moment().unix()).format("ddd"));
+            return moment.unix(moment().unix()).format("ddd");
             break;
         case 'HH':
             return Number(moment.unix(moment().unix()).format("HH"));
@@ -119,7 +119,7 @@ async function fb_dtsg() {
         'Cookie': a
     }
     if (globals_['fb_dtsg'] == undefined) {
-        var data = await request__('https://m.facebook.com', 'GET', headers)
+        var data = await request__('https://www.facebook.com', 'GET', headers)
         data = data.match(/name="fb_dtsg" value="(.*)" autocomplete="off" \/><input/ig)
         data = data[0].replace('name="fb_dtsg" value="', '')
         data = data.replace('" autocomplete="off" /><input', '')
@@ -140,12 +140,16 @@ func.access_token = async function () {
         'Cookie': a
     }
     if (globals_['access_token'] == undefined) {
-        var data = await request__('https://www.facebook.com/' + b, 'GET', headers, {}, true)
-        data = data.match(/<a accesskey="7" class="accessible_elem" href="https:\/\/www.facebook.com\/(.*)\/allactivity\?privacy_source/)
-        data = data[0].replace('<a accesskey="7" class="accessible_elem" href="https://www.facebook.com/', '')
-        data = data.replace('/allactivity?privacy_source', '')
+        var data_ = await request__('https://www.facebook.com/profile.php?id=' + b, 'GET', headers, {}, true)
+        data = data_.match(/<a accesskey="7" class="accessible_elem" href="https:\/\/www.facebook.com\/(.*)\/allactivity\?privacy_source/)
+        if (data != null) {
+            data = data[0].replace('<a accesskey="7" class="accessible_elem" href="https://www.facebook.com/', '')
+            data = data.replace('/allactivity?privacy_source', '')
 
-        var data = await request__('https://www.facebook.com/' + data, 'GET', headers, {})
+            var data = await request__('https://www.facebook.com/' + data, 'GET', headers, {})
+        } else {
+            var data = data_
+        }
         data = data.match(/multi_partitioning_enabled:false,access_token:"(.*)",resumability_enabled/)
         data = data[0].split('",resumability_enabled')[0]
         data = data.replace('multi_partitioning_enabled:false,access_token:"', '')

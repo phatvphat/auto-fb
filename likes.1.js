@@ -23,8 +23,8 @@ async function loop(REACT, to) {
             // Hàm REACT bài viết
             if (!b.includes(id_post)) {
                 func.writeFile_(src, id_post)
-                // var data = await func.react_post(id_post.split('_')[1], REACT) // 'LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY'
-                // console.log(data)
+                var data = await func.react_post(id_post.split('_')[1], REACT) // 'LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY'
+                console.log(data)
             }
         }
         i++

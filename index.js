@@ -13,8 +13,9 @@ const cmt_uptop = require('./cmt-uptop.1')
 
 // ---------- START SETTING ---------- //
 var config = {
-    username: 'pvp.sad', // Tên đăng nhập FB
-    password: 'pvp.2001', // Mật khẩu FB
+    username: '', // Tên đăng nhập FB
+    password: '', // Mật khẩu FB
+    // Muốn đổi sang tài khoản khác hãy xoá file appstate.json nếu có
 
     MODE_REACT_POST: true, // Bật hoặc Tắt chức năng REACT bài viết bạn bè
     REACT: 'LIKE', // 'LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY' || Tương tác bài viết bạn bè
